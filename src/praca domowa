@@ -1,3 +1,5 @@
+//wklejone także do Router.php
+
 public function generateUrl($name, $parameters = null)
     {
         foreach ($this->routes as $key => $value) {
