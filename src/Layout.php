@@ -65,7 +65,8 @@ class Layout
     {
         ob_start();
         extract([
-            'request' => $this->request
+            'request' => $this->request,
+            'router'=> ServiceContainer::getInstance()->get('router')
         ]);
         include "../templates/{$this->page}.php";
 
