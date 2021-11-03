@@ -82,4 +82,8 @@ class Router
 
         return '/' . implode('/', $uri);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 051901f74152063c679a3d86be2292d08cb7f9d8
