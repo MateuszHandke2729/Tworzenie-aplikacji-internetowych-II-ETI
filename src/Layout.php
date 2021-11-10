@@ -38,7 +38,6 @@ class Layout
         string $page,
         string $name = 'default',
         string $title = 'APSL Website!'
-
     ) {
         $this->page = $page;
         $this->name = $name;
@@ -48,14 +47,18 @@ class Layout
 
     /**
      * Process and render layout
+     * @return string
      */
-    public function render(): void
+    public function render(): string
     {
         extract([
             'title' => $this->title,
             'content' => $this->renderTemplate()
         ]);
+
+        ob_start();
         include __DIR__ . "/../layouts/{$this->name}.php";
+        return ob_get_clean();
     }
 
     /**
@@ -66,7 +69,7 @@ class Layout
         ob_start();
         extract([
             'request' => $this->request,
-            'router'=> ServiceContainer::getInstance()->get('router')
+            'router' => ServiceContainer::getInstance()->get('router')
         ]);
         include "../templates/{$this->page}.php";
 

@@ -3,7 +3,8 @@
 namespace App\Controllers;
 
 use App\Request;
-use App\Response;
+use App\Response\JsonResponse;
+use App\Response\Response;
 
 class SimpleController implements ControllerInterface
 {
@@ -18,7 +19,6 @@ class SimpleController implements ControllerInterface
             'param1' => 'value 1'
         ];
 
-        $additionalHeaders = ['Content-Type: application/json'];
-        return new Response(json_encode($body), $additionalHeaders);
+        return new JsonResponse($body);
     }
 }
