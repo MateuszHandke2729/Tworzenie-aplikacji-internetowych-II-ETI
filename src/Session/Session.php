@@ -55,8 +55,14 @@ class Session
         return $_SESSION[$name] ?? $default;
     }
 
-    public function set(string $name, $value)
+    public function set(string $name, $value, $isGlobal = false)
     {
+        if ($isGlobal) {
+            $globals = json_decode(($_SESSION['globals'] ?? '[]'), true);
+            $globals[$name] = null;
+            $_SESSION['globals'] = json_encode($globals);
+        }
+
         if (!$this->sessionStarted) {
             $this->start();
         }
@@ -71,25 +77,23 @@ class Session
 
     public function regenerate()
     {
-        //TODO: check and fix.
-//        if (!$this->sessionStarted) {
-//            $this->start();
-//        }
-//        $currentVars = [];
-//        $globals = json_decode($_SESSION['globals'] ?? '[]', true);
-//
-//        foreach (array_keys($globals) as $key) {
-//            $currentVars[$key] = $this->get($key);
-//        }
-//
-//        $this->destroy();
-//        session_id(session_create_id());
-//        $this->start();
-//
-//        foreach ($currentVars as $key => $value) {
-//            $this->set($key, $value, true);
-//        }
-//        $_SESSION['globals'] = $globals;
+        if (!$this->sessionStarted) {
+            $this->start();
+        }
+        $currentVars = [];
+        $globals = json_decode($_SESSION['globals'] ?? '[]', true);
+
+        foreach (array_keys($globals) as $key) {
+            $currentVars[$key] = $this->get($key);
+        }
+
+        $this->destroy();
+        session_id(session_create_id());
+        $this->start();
+
+        foreach ($currentVars as $key => $value) {
+            $this->set($key, $value, true);
+        }
+        $_SESSION['globals'] = $globals;
     }
 }
-

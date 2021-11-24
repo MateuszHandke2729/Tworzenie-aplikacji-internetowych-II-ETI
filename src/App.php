@@ -3,6 +3,11 @@
 namespace App;
 
 use App\Controllers\ControllerInterface;
+use App\Exception\PageNotFoundException;
+use App\Exception\ServiceNotFoundException;
+use App\Response\ErrorResponse;
+use \mysql_xdevapi\Exception;
+use App\Session;
 
 /**
  * Application entry point.
@@ -24,33 +29,25 @@ class App
      */
     public function run(): void
     {
-        $something = function (){
-                echo '123';
-                return '456';
-        };
-        $something2 = '123';
-        var_dump(is_callable($something), is_callable($something2));
-
-        var_dump($something);
-
         //$this->processRouting();
         $this->request = Request::initialize();
         $serviceContainer = ServiceContainer::getInstance();
         $router = $serviceContainer->get('router');
 
-        /** @var Router $router */
-        $matchedRoute = $router->match($this->request);
-//        if ($matchedRoute instanceof ControllerInterface) {
-//            $response = $matchedRoute($this->request);
-//            foreach ($response->getHeaders() as $header) {
-//                header($header);
-//            }
-//
-//            echo $response->getBody();
-//
-//        } else {
-//            $layout = new Layout($this->request, $matchedRoute);
-//            $layout->render();
-//        }
+        try {
+            /** @var Router $router */
+            $matchedRoute = $router->match($this->request);
+            $response = $matchedRoute($this->request);
+        } catch (PageNotFoundException $exception) {
+            $response = new ErrorResponse($router, $exception, 404);
+        } catch (Exception $exception) {
+            $response = new ErrorResponse($router, $exception, 500);
+        }
+
+        foreach ($response->getHeaders() as $header) {
+            header($header);
+        }
+
+        echo $response->getBody();
     }
 }

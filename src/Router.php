@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Controllers\ControllerInterface;
+use App\Exception\PageNotFoundException;
 
 class Router
 {
@@ -14,9 +15,18 @@ class Router
     /**
      * @param array $routes
      */
-    public function __construct(array $routes)
+    public function __construct(array $routes = [])
     {
         $this->routes = $routes;
+    }
+
+    /**
+     * @param string $name
+     * @param array $routeConfig
+     */
+    public function addRoute(string $name, array $routeConfig)
+    {
+        $this->routes[$name] = $routeConfig;
     }
 
     /**
@@ -37,17 +47,17 @@ class Router
             if ($params !== false) {
                 $request->setPathParameters($params);
                 $controllerFactory = $routeConfig['controller'] ?? null;
-                if (is_callable($controllerFactory)) {
+                if ($controllerFactory instanceof \Closure) {
                     return $controllerFactory();
                 } else {
                     if ($controllerFactory instanceof ControllerInterface) {
                         return $controllerFactory;
                     }
                 }
-                throw new \Exception('Page not found! Sorry!');
+                throw new PageNotFoundException();
             }
         }
-        throw new \Exception('Page not found! Sorry!');
+        throw new PageNotFoundException();
     }
 
     /**
@@ -87,7 +97,6 @@ class Router
                 $uri[] = $routeSegments[$i];
             }
         }
-
-        return '/' . implode('/', $uri);
+        return implode('\\', $uri);
     }
 }
