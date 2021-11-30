@@ -25,4 +25,5 @@ class FlashMessages
     {
         $this->messages[] = $type -> $message;
     }
+ 
 }
